@@ -37,7 +37,6 @@ Once the script has finished running, proceed to the next step.
 
 2. Check with `docker volume list` to see if both the *wp_dir and *database_dir volumes are listed. Those are volumes that will be used for data persistence for both the WP and DB data. It means that the volumes and data stored on them will be preserved, even if the WP and DB containers are deleted.
 
-======Potentially remove this section======
 3. Run the following command: 
 
 `docker image list` 
@@ -48,9 +47,7 @@ You may notice images with empty tags or repository name. In this case run the n
 
 I will try to automate it in the future, but for now, I haven't had enough time for that. 
 
-===========================================
-
-3. Since the data is persisting, you should be able to locate the Wordpress folders outside of the Docker images, on a local disk. The path is usually as follows: 
+4. Since the data is persisting, you should be able to locate the Wordpress folders outside of the Docker images, on a local disk. The path is usually as follows: 
 
 `/var/lib/docker/volumes/[volume_name]`
 
