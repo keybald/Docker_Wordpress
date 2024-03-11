@@ -1,25 +1,26 @@
-The purpose behind the scripts:
+## The purpose behind the scripts:
 
 To automate installation of Wordpress. In addition, after the scripts have finished installing the software, it should be possible to see a videoclip of Frank Sinatra when opening the main Wordpress page. Also, developers should have access to a persistent volume where they should be able to make modifications to various configuration files that are located within the Wordpress Docker image.
 
-Pre-requisites: 
+## Pre-requisites: 
 
 1. You need to make sure that the Docker and the docker-compose tool are installed on the machine which will have the containers installed in place. 
 
-Installation instructions:
+## Installation instructions:
 
 1. Navigate to the Docker/project folder and execute the following command as the root user: 
 
-./script.sh up
+`./script.sh up`
 
 This command will cause for the docker containers to be created, one called WP and another DB, and populated with services such as MySQL, Apache or Wordpress. It may take about 2 minutes for the script to complete running, so please don't interrupt it. 
 
 On my test system I ran the script from this location: /root/Docker/project/script.sh. I don't anticipate any problems from running the script in another location, but please preserve the folder sctructure to be as follows: 
 
+```
 Docker
      |_docker
      |_project
-
+```
 If you are running the script for the first time, you should run it with the `up` option to make everything work correctly, as it will execute `docker-compose up` command, among other things. Then you can use `stop` and `start` to control the lifecycle of the Docker containers. If you are a developer and need to have access to WordPress files located on one of the Docker containers, please run `./script.sh mount`. The folder containing Wordpress related files should appear in the same folder as the script itself. Once you finish working with the folder you can unmount it by issuing `./script.sh unmount` command. You can use `status` command to see whether the Docker container system is running or not. 
 
 The script itself is also responsible for adding a wp.local entry to /etc/hosts on the Host machine. You then need to open your web browser and type in wp.local into the address field. Hopefully, the Wordpress configuration website will open. If you run `./script.sh down` command, the network settings will be affected as the system will delete the network settings of the Docker containers. Fortunately the script will take care of assigning a new IP address in the hosts file next time you start the script with `./script.sh up` command. The script will modify the wp-config.php file to set the URL of the website to http://wp.local. You will notice that you can't change this setting from within the UI, you need to modify the PHP file itself (wp-config.php). 
@@ -39,11 +40,11 @@ Once the script has finished running, proceed to the next step.
 ======Potentially remove this section======
 3. Run the following command: 
 
-docker image list 
+`docker image list` 
 
 You may notice images with empty tags or repository name. In this case run the next command to get rid of those images: 
 
-docker rmi $(docker images -f "dangling=true" -q)
+`docker rmi $(docker images -f "dangling=true" -q)`
 
 I will try to automate it in the future, but for now, I haven't had enough time for that. 
 
@@ -51,18 +52,18 @@ I will try to automate it in the future, but for now, I haven't had enough time 
 
 3. Since the data is persisting, you should be able to locate the Wordpress folders outside of the Docker images, on a local disk. The path is usually as follows: 
 
-/var/lib/docker/volumes/[volume_name]
+`/var/lib/docker/volumes/[volume_name]`
 
-In our case, we have two volumes: one storing MySQL database and the second one the Wordpress folders. Use mount and unmount command to gain access to the Wordpress files from the same folder where the script.sh is located. 
+In our case, we have two volumes: one storing MySQL database and the second one the Wordpress folders. Use mount and unmount command to gain access to the Wordpress files from the same folder where the `script.sh` is located. 
 
-XDebug notes: 
+## XDebug notes: 
 
 1. After running `script.sh up` from the previous steps, the script will also take care of configuring php.ini and installing xdebug on the WP server. 
 
 2. After launching Visual Studio Code, install the PHP Debug extension. 
 
 3. Click 'Run and Debug' option in VSC. On the top of the window you will have 'Listen for Xdebug' option. Click on the small cog icon and paste the following into the launch.json tab: 
-
+```
 {
     // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
@@ -92,28 +93,28 @@ XDebug notes:
         },
     ]
 }
-
+```
 4. To check if the debug works properly, run the following command:
 
-a) docker container ps
+a) `docker container ps`
 b) Take note of the CONTAINER ID of the wordpress target and run the following command: 
 
-docker exec -it "PUT_CONTAINER_ID_HERE" /bin/bash
+`docker exec -it "PUT_CONTAINER_ID_HERE" /bin/bash`
 
 c) The above command should allow you to connect to the Wordpress container.
-d) You can now go to /var/www/html and create a file, let's call it myscript.php.
+d) You can now go to `/var/www/html` and create a file, let's call it `myscript.php`.
 e) Paste the following into the PHP file: 
-
+```
 <?php 
 
 xdebug_break();
 $a=1;
 
 ?>
-
+```
 f) Make sure that the debugger is listening in Visual Studio Code. Then run the following command: 
 
-php myscript.php
+`php myscript.php`
 
 The result should be establishing a connection between XDebug and Visual Studio Code, which means that all works as expected. 
 
